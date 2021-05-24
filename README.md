@@ -1,4 +1,4 @@
-# valotime
+# Valotime
 Valotime provides live countdown according to your current timezone for every next VALORANT Act.
 
 Its a simple PWA made with Vue 3.
