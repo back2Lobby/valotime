@@ -42,26 +42,38 @@ export default {
         minutes:"",
         seconds:""
       },
-      target_pst_raw_time: "Jun 23, 2021 03:00 AM",
+      target_pkt_raw_time: "Jun 23, 2021 03:00 AM",
+      target_local_raw_time:"",
+      pkt_time:"",
+      local_time:"",
+      local_zone_abbr:""
     }
   },
   computed:{
     targetTime(){
-      return this.target_pst_raw_time + " PST";
+      return this.target_local_raw_time + " " +  this.local_zone_abbr;
     }
   },
   created(){
-    this.getCountDownData();
+    this.setupTimes();
+    
     setInterval(()=>{
       this.getCountDownData();
-    },1000);
+    },6000);
   },
 
   methods:{
+    setupTimes(){
+      this.local_zone_abbr = moment.tz(moment.tz.guess()).zoneAbbr();
+
+      this.pkt_time = moment.tz(moment(this.target_pkt_raw_time,["MMM D, YYYY hh:mm A"]),'Asia/Karachi');
+      this.local_time = this.pkt_time.clone().tz(moment.tz.guess());
+      this.target_local_raw_time = this.local_time.format("MMM D, YYYY hh:mm A");
+
+      this.getCountDownData();
+    },
     getCountDownData(){
-    var pst = moment.tz(moment(this.target_pst_raw_time,["MMM D, YYYY hh:mm A"]),'America/Los_Angeles');
-    var loc = pst.clone().tz(moment.tz.guess());
-    var d = moment.duration(loc.diff(moment().d))._data;
+    let d = moment.duration(this.local_time.diff(moment().d))._data;
     this.remaining.months = d.months.toLocaleString("en-US",{minimumIntegerDigits:2});
     this.remaining.days = d.days.toLocaleString("en-US",{minimumIntegerDigits:2});
     this.remaining.hours = d.hours.toLocaleString("en-US",{minimumIntegerDigits:2});
