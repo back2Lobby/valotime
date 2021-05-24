@@ -1,4 +1,6 @@
 # valotime
+Valotime provides live countdown according to your current timezone for every next VALORANT Act.
+> Visit : https://valotime.onrender.com/
 
 ## Project setup
 ```
