@@ -59,7 +59,7 @@ export default {
     
     setInterval(()=>{
       this.getCountDownData();
-    },6000);
+    },1000);
   },
 
   methods:{
