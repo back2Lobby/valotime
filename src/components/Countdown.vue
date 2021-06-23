@@ -1,7 +1,7 @@
 <template>
 
 <div class="raw-statement">
-  Valorant Episode 3 Act 1 Release Date : <strong> {{ targetTime }}</strong>
+  Valorant Episode 3 Act 2 Release Date : <strong> {{ targetTime }}</strong>
 </div>
 
 <div class="timebox-container">
@@ -42,7 +42,7 @@ export default {
         minutes:"",
         seconds:""
       },
-      target_pkt_raw_time: "Jun 23, 2021 03:00 AM",
+      target_pkt_raw_time: "Aug 25, 2021 08:00 AM",
       target_local_raw_time:"",
       pkt_time:"",
       local_time:"",
