@@ -42,7 +42,7 @@ export default {
         minutes:"",
         seconds:""
       },
-      target_pkt_raw_time: "Aug 25, 2021 08:00 AM",
+      target_pkt_raw_time: "Sep 9, 2021 08:00 AM",
       target_local_raw_time:"",
       pkt_time:"",
       local_time:"",
