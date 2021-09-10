@@ -42,38 +42,50 @@ export default {
         minutes:"",
         seconds:""
       },
-      target_pkt_raw_time: "Sep 9, 2021 08:00 AM",
-      target_local_raw_time:"",
-      pkt_time:"",
-      local_time:"",
+      act_time_raw:"",
+      act_time:"",
       local_zone_abbr:""
     }
   },
   computed:{
     targetTime(){
-      return this.target_local_raw_time + " " +  this.local_zone_abbr;
+      return this.act_time_raw + " " +  this.local_zone_abbr;
     }
   },
   created(){
-    this.setupTimes();
-    
-    setInterval(()=>{
-      this.getCountDownData();
-    },1000);
+
+    let _this = this;
+
+    this.loadNextActTime().then(function(){
+      _this.setupTimes();
+
+      setInterval(()=>{
+        _this.getCountDownData();
+      },1000);
+    })
   },
 
   methods:{
+    loadNextActTime(){
+      return fetch('https://valorant-api.com/v1/seasons')
+                .then(res => res.json())
+                .then(res => {
+                  let acts = res.data.filter(function(act){
+                  	return act.type != null && !moment(act.endTime).isBefore();
+                  })
+                  // this.act_time = moment.tz(moment(acts[0].startTime,["MMM D, YYYY hh:mm A"]),moment.tz.guess());
+                  this.act_time = moment(acts[0].endTime).tz(moment.tz.guess());
+                });
+    },
     setupTimes(){
       this.local_zone_abbr = moment.tz(moment.tz.guess()).zoneAbbr();
 
-      this.pkt_time = moment.tz(moment(this.target_pkt_raw_time,["MMM D, YYYY hh:mm A"]),'Asia/Karachi');
-      this.local_time = this.pkt_time.clone().tz(moment.tz.guess());
-      this.target_local_raw_time = this.local_time.format("MMM D, YYYY hh:mm A");
+      this.act_time_raw = this.act_time.add(3,'hours').format("MMM D, YYYY hh:mm A");
 
       this.getCountDownData();
     },
     getCountDownData(){
-    let d = moment.duration(this.local_time.diff(moment().d))._data;
+    let d = moment.duration(moment(this.act_time_raw).diff(moment()))._data;
     this.remaining.months = d.months.toLocaleString("en-US",{minimumIntegerDigits:2});
     this.remaining.days = d.days.toLocaleString("en-US",{minimumIntegerDigits:2});
     this.remaining.hours = d.hours.toLocaleString("en-US",{minimumIntegerDigits:2});
