@@ -1,7 +1,7 @@
 <template>
 
 <div class="raw-statement">
-  Valorant Episode 3 Act 2 Release Date : <strong> {{ targetTime }}</strong>
+  Valorant {{episodeName}} {{actName}} Release Date : <strong> {{ targetTime }}</strong>
 </div>
 
 <div class="timebox-container">
@@ -44,6 +44,8 @@ export default {
       },
       act_time_raw:"",
       act_time:"",
+      episodeName:"",
+      actName:"",
       local_zone_abbr:""
     }
   },
@@ -71,10 +73,14 @@ export default {
                 .then(res => res.json())
                 .then(res => {
                   let acts = res.data.filter(function(act){
-                  	return act.type != null && !moment(act.endTime).isBefore();
+                  	return act.type != null && !moment(act.startTime).isBefore();
                   })
                   // this.act_time = moment.tz(moment(acts[0].startTime,["MMM D, YYYY hh:mm A"]),moment.tz.guess());
-                  this.act_time = moment(acts[0].endTime).tz(moment.tz.guess());
+                  this.act_time = moment(acts[0].startTime).tz(moment.tz.guess());
+                  let ep = (new RegExp('(Episode)([0-9])+').exec(acts[0].assetPath));
+                  let a = (new RegExp('(Act)([0-9])+').exec(acts[0].assetPath));
+                  this.episodeName = ep[1]+" "+ep[2];
+                  this.actName = a[1]+" "+a[2];
                 });
     },
     setupTimes(){
@@ -85,7 +91,7 @@ export default {
       this.getCountDownData();
     },
     getCountDownData(){
-    let d = moment.duration(moment(this.act_time_raw).diff(moment()))._data;
+    let d = moment.duration(moment(this.act_time_raw).diff(moment().tz(moment.tz.guess())))._data;
     this.remaining.months = d.months.toLocaleString("en-US",{minimumIntegerDigits:2});
     this.remaining.days = d.days.toLocaleString("en-US",{minimumIntegerDigits:2});
     this.remaining.hours = d.hours.toLocaleString("en-US",{minimumIntegerDigits:2});
