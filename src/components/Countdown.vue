@@ -33,6 +33,7 @@ import moment from "moment-timezone";
 
 export default {
   name: 'HelloWorld',
+  props:['region'],
   data(){
     return{
       remaining:{
@@ -43,7 +44,7 @@ export default {
         seconds:""
       },
       act_time_raw:"",
-      act_time:"",
+      act_time:null,
       episodeName:"",
       actName:"",
       local_zone_abbr:""
@@ -76,7 +77,7 @@ export default {
                   	return act.type != null && !moment(act.startTime).isBefore();
                   })
                   // this.act_time = moment.tz(moment(acts[0].startTime,["MMM D, YYYY hh:mm A"]),moment.tz.guess());
-                  this.act_time = moment(acts[0].startTime).tz(moment.tz.guess());
+                  this.act_time = moment.utc(acts[0].startTime);
                   let ep = (new RegExp('(Episode)([0-9])+').exec(acts[0].assetPath));
                   let a = (new RegExp('(Act)([0-9])+').exec(acts[0].assetPath));
                   this.episodeName = ep[1]+" "+ep[2];
@@ -85,19 +86,36 @@ export default {
     },
     setupTimes(){
       this.local_zone_abbr = moment.tz(moment.tz.guess()).zoneAbbr();
-
-      this.act_time_raw = this.act_time.add(3,'hours').format("MMM D, YYYY hh:mm A");
-
+      this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A")
       this.getCountDownData();
     },
     getCountDownData(){
-    let d = moment.duration(moment(this.act_time_raw).diff(moment().tz(moment.tz.guess())))._data;
-    this.remaining.months = d.months.toLocaleString("en-US",{minimumIntegerDigits:2});
-    this.remaining.days = d.days.toLocaleString("en-US",{minimumIntegerDigits:2});
-    this.remaining.hours = d.hours.toLocaleString("en-US",{minimumIntegerDigits:2});
-    this.remaining.minutes = d.minutes.toLocaleString("en-US",{minimumIntegerDigits:2});
-    this.remaining.seconds = d.seconds.toLocaleString("en-US",{minimumIntegerDigits:2});
-    }
+      this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A");
+      let d = moment.duration(this.act_time.diff(moment.utc())).add(this.getRegionHoursGap(),'hours')._data;
+      this.remaining.months = d.months.toLocaleString("en-US",{minimumIntegerDigits:2});
+      this.remaining.days = d.days.toLocaleString("en-US",{minimumIntegerDigits:2});
+      this.remaining.hours = d.hours.toLocaleString("en-US",{minimumIntegerDigits:2});
+      this.remaining.minutes = d.minutes.toLocaleString("en-US",{minimumIntegerDigits:2});
+      this.remaining.seconds = d.seconds.toLocaleString("en-US",{minimumIntegerDigits:2});
+    },
+    getRegionHoursGap(){
+      switch(this.region){
+        case "Asia Pacific":
+          return 21;
+        case "Brazil":
+          return 13;
+        case "Europe":
+          return 27;
+        case "Korea":
+          return 21;
+        case "Latin America":
+          return 13;
+        case "North America":
+          return 13;
+        default:
+          return 13;
+      }
+    },
   }
 }
 </script>
