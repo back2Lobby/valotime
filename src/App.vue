@@ -1,8 +1,8 @@
 <template>
 <div class="head">
   <h2 class="logo">Valotime</h2>
-  <div style="position:absolute;right:0;top:1rem;margin-right:1rem;">
-    <label style="color:#ddd;margin-right:0.4rem;">Select Region</label>
+  <div style="position:absolute;right:0;top:1rem;margin-right:1rem;display:flex;">
+    <!-- select region -->
     <select class="region-dropdown" v-model="region">
       <option value="Asia Pacific">Asia Pacific</option>
       <option value="Brazil">Brazil</option>
@@ -11,6 +11,11 @@
       <option value="Latin America">Latin America</option>
       <option value="North America" selected>North Amercia</option>
     </select>
+
+    <!-- github repo -->
+    <a class="github-button" href="https://github.com/back2Lobby/valotime" alt="Github Repository Link" target="_blank" title="Visit Github Repository">
+      <img src="img/github.png" alt="" width="26" height="26">
+    </a>
   </div>
   <p>Valotime provides live countdown according to your current timezone for every next VALORANT Act.</p>
 </div>
@@ -86,6 +91,14 @@ body{
 .region-dropdown option:hover{
   background-color: #212121;
   color:#cf3333;
+}
+
+.github-button{
+  display: flex;
+  align-items: center;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+  cursor: pointer;
 }
 
 </style>
