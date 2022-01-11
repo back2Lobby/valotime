@@ -58,42 +58,40 @@ export default {
   created(){
     
     let _this = this;
+    _this.loadNewData(_this);
+
     if(!navigator.onLine){
       window.addEventListener("online",()=>{
         _this.loadNewData(_this);
       });
-    }else{
-        _this.loadNewData(_this);
     }
+
   },
 
   methods:{
-    loadNewData(_this){
-      
-        this.loadNextActTime(_this).then(function(){
+    async loadNewData(_this){
+
+        await this.loadNextActTime(_this);
         _this.setupTimes();
 
         setInterval(()=>{
           _this.getCountDownData();
         },1000);
-      })
     },
-    loadNextActTime(_this){
-      
-        if(navigator.onLine){
-          return fetch('https://valorant-api.com/v1/seasons')
-              .then(res => res.json())
-              .then(res => {
-                localStorage.setItem("seasons_data",JSON.stringify(res));
-                this.setupEpisodeData(res,_this);
-              });
+    async loadNextActTime(_this){
+      if(navigator.onLine){
+          const res = await fetch('https://valorant-api.com/v1/seasons');
+          const resParsed = await res.json();
+          let seasons = resParsed.data;
+          localStorage.setItem("seasons_data", JSON.stringify(seasons));
+          this.setupEpisodeData(seasons, _this);
         }else{
           this.setupEpisodeData(JSON.parse(localStorage.getItem("seasons_data")),_this);
         }
     },
-    setupEpisodeData(res,_this){
-      if(res){
-        let acts = res.data.filter(act => {
+    setupEpisodeData(seasons_data,_this){
+      if(seasons_data){
+        let acts = seasons_data.filter(act => {
           let diff = moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds;
           return act.type != null && diff >= 0;
         })
@@ -106,7 +104,9 @@ export default {
     },
     setupTimes(){
       this.local_zone_abbr = moment.tz(moment.tz.guess()).zoneAbbr();
-      this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A")
+      if(this.act_time){
+        this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A")
+      }
       this.getCountDownData();
     },
     getCountDownData(){
