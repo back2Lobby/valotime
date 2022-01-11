@@ -56,19 +56,20 @@ export default {
     }
   },
   created(){
+    debugger;
     let _this = this;
-    if(navigator.onLine){
-      _this.loadNewData(_this);
+    if(!navigator.onLine){
+      window.addEventListener("online",()=>{
+        _this.loadNewData(_this);
+      });
     }else{
-        window.addEventListener("online",()=>{
-          _this.loadNewData(_this);
-        });
-        
-      }
+        _this.loadNewData(_this);
+    }
   },
 
   methods:{
     loadNewData(_this){
+      debugger;
         this.loadNextActTime(_this).then(function(){
         _this.setupTimes();
 
@@ -78,10 +79,12 @@ export default {
       })
     },
     loadNextActTime(_this){
+      debugger;
         if(navigator.onLine){
           return fetch('https://valorant-api.com/v1/seasons')
               .then(res => res.json())
               .then(res => {
+                debugger;
                 localStorage.setItem("seasons_data",JSON.stringify(res));
                 this.setupEpisodeData(res,_this);
               });
@@ -90,6 +93,7 @@ export default {
         }
     },
     setupEpisodeData(res,_this){
+      debugger;
       if(res){
         let acts = res.data.filter(act => {
           let diff = moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds;
