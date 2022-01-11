@@ -3,7 +3,7 @@
   <h2 class="logo">Valotime</h2>
   <div style="position:absolute;right:0;top:1rem;margin-right:1rem;display:flex;">
     <!-- select region -->
-    <select class="region-dropdown" v-model="region">
+    <select class="region-dropdown" v-model="region" @change="regionChanged">
       <option value="Asia Pacific">Asia Pacific</option>
       <option value="Brazil">Brazil</option>
       <option value="Europe">Europe</option>
@@ -19,7 +19,7 @@
   </div>
   <p>Valotime provides live countdown according to your current timezone for every next VALORANT Act.</p>
 </div>
-  <Countdown v-bind:region="region" />
+  <Countdown ref="countdown" />
   <a class="follow" href="https://twitter.com/Back2Lobby">Follow @Back2Lobby</a>
 </template>
 
@@ -35,6 +35,11 @@ export default {
   },
   components: {
     Countdown
+  },
+  methods: {
+    regionChanged() {
+      this.$refs.countdown.regionChanged(this.region);
+    }
   }
 }
 </script>

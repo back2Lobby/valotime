@@ -32,8 +32,7 @@
 import moment from "moment-timezone";
 
 export default {
-  name: 'HelloWorld',
-  props:['region'],
+  name: 'Countdown',
   data(){
     return{
       remaining:{
@@ -47,7 +46,8 @@ export default {
       act_time:null,
       episodeName:"",
       actName:"",
-      local_zone_abbr:""
+      local_zone_abbr:"",
+      region:"",
     }
   },
   computed:{
@@ -56,7 +56,6 @@ export default {
     }
   },
   created(){
-    
     let _this = this;
     _this.loadNewData(_this);
 
@@ -65,58 +64,70 @@ export default {
         _this.loadNewData(_this);
       });
     }
-
   },
-
   methods:{
-    async loadNewData(_this){
-
-        await this.loadNextActTime(_this);
-        _this.setupTimes();
-
+    loadNewData(_this = this,fetchData = true){
+        this.loadNextActTime(_this,fetchData);
+      
         setInterval(()=>{
           _this.getCountDownData();
         },1000);
     },
-    async loadNextActTime(_this){
-      if(navigator.onLine){
-          const res = await fetch('https://valorant-api.com/v1/seasons');
-          const resParsed = await res.json();
-          let seasons = resParsed.data;
-          localStorage.setItem("seasons_data", JSON.stringify(seasons));
-          this.setupEpisodeData(seasons, _this);
+    async loadNextActTime(_this,fetchData = true){
+      if(navigator.onLine && fetchData){
+          fetch("https://valorant-api.com/v1/seasons").then(res => res.json()).then(res => {
+            let seasons = res.data;
+            localStorage.setItem("seasons_data", JSON.stringify(seasons));
+            this.setupEpisodeData(seasons, _this);
+          })
         }else{
           this.setupEpisodeData(JSON.parse(localStorage.getItem("seasons_data")),_this);
         }
+
+      _this.local_zone_abbr = moment.tz(moment.tz.guess()).zoneAbbr();
+      if(_this.act_time){
+        _this.act_time_raw = moment(_this.act_time.clone().add(_this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A")
+      }
     },
     setupEpisodeData(seasons_data,_this){
-      if(seasons_data){
-        let acts = seasons_data.filter(act => {
-          let diff = moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds;
-          return act.type != null && diff >= 0;
-        })
-        this.act_time = moment.utc(acts[0].startTime);
-        let ep = (new RegExp('(Episode)([0-9])+').exec(acts[0].assetPath));
-        let a = (new RegExp('(Act)([0-9])+').exec(acts[0].assetPath));
-        this.episodeName = ep[1]+" "+ep[2];
-        this.actName = a[1]+" "+a[2];
-      }
+        if(seasons_data){
+          let acts = seasons_data.filter(act => {
+            if(act.assetPath.includes("Act")){
+              let diff = moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds;
+              return act.type != null && diff >= 0;
+            }
+          })
+          _this.act_time = moment.utc(acts[0].startTime);
+          let ep = (new RegExp('(Episode)([0-9])+').exec(acts[0].assetPath));
+          let a = (new RegExp('(Act)([0-9])+').exec(acts[0].assetPath));
+          _this.episodeName = ep[1]+" "+ep[2];
+          _this.actName = a[1]+" "+a[2];
+        }
     },
-    setupTimes(){
-      this.local_zone_abbr = moment.tz(moment.tz.guess()).zoneAbbr();
-      if(this.act_time){
-        this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A")
-      }
-      this.getCountDownData();
+    regionChanged(region){
+      this.region = region;
+      this.loadNewData(this,false);
     },
+    // setupTimes(){
+    //   this.local_zone_abbr = moment.tz(moment.tz.guess()).zoneAbbr();
+    //   if(this.act_time){
+    //     this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A")
+    //   }
+    //   this.getCountDownData();
+    // },
     getCountDownData(){
-      this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A");
-      let d = moment.duration(this.act_time.diff(moment.utc())).add(this.getRegionHoursGap(),'hours')._data;
-      this.remaining.months = d.months.toLocaleString("en-US",{minimumIntegerDigits:2});
-      this.remaining.days = d.days.toLocaleString("en-US",{minimumIntegerDigits:2});
-      this.remaining.hours = d.hours.toLocaleString("en-US",{minimumIntegerDigits:2});
-      this.remaining.minutes = d.minutes.toLocaleString("en-US",{minimumIntegerDigits:2});
-      this.remaining.seconds = d.seconds.toLocaleString("en-US",{minimumIntegerDigits:2});
+      if(this.act_time){
+        this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A");
+        let d = moment.duration(this.act_time.diff(moment.utc())).add(this.getRegionHoursGap(),'hours')._data;
+        this.remaining.months = d.months.toLocaleString("en-US",{minimumIntegerDigits:2});
+        this.remaining.days = d.days.toLocaleString("en-US",{minimumIntegerDigits:2});
+        this.remaining.hours = d.hours.toLocaleString("en-US",{minimumIntegerDigits:2});
+        this.remaining.minutes = d.minutes.toLocaleString("en-US",{minimumIntegerDigits:2});
+        this.remaining.seconds = d.seconds.toLocaleString("en-US",{minimumIntegerDigits:2});
+        if(this.remaining.seconds < 0){
+          this.loadNextActTime(this,false);
+        }
+      }
     },
     getRegionHoursGap(){
       switch(this.region){
