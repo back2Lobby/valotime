@@ -1,7 +1,7 @@
 {
     "name": "Valotime",
     "short_name": "valotime",
-    "theme_color": "#f84550",
+    "theme_color": "#cf3333",
     "icons": [
       {
         "src": "./img/icons/valotime-192x192.png",
