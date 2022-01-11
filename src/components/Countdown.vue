@@ -56,38 +56,61 @@ export default {
     }
   },
   created(){
-
     let _this = this;
+    if(navigator.onLine){
+      _this.loadNewData(_this);
+    }else{
+        window.addEventListener("online",()=>{
+          _this.loadNewData(_this);
+        });
 
-    this.loadNextActTime().then(function(){
-      _this.setupTimes();
-
-      setInterval(()=>{
-        _this.getCountDownData();
-      },1000);
-    })
+        this.act_time = localStorage.getItem("act_time");
+        this.episodeName = localStorage.getItem("episodeName");
+        this.actName = localStorage.getItem("actName");
+        this.local_zone_abbr = localStorage.getItem("local_zone_abbr");
+        this.act_time_raw = localStorage.getItem("act_time_raw");
+        this.remaining.months = localStorage.getItem("remainingMonths");
+        this.remaining.days = localStorage.getItem("remainingDays");
+        this.remaining.hours = localStorage.getItem("remainingHours");
+        this.remaining.minutes = localStorage.getItem("remainingMinutes");
+        this.remaining.seconds = localStorage.getItem("remainingSeconds");
+      }
   },
 
   methods:{
-    loadNextActTime(){
-      return fetch('https://valorant-api.com/v1/seasons')
-                .then(res => res.json())
-                .then(res => {
-                  let acts = res.data.filter(function(act){
-                  	return act.type != null && !moment(act.startTime).isBefore();
+    loadNewData(_this){
+        this.loadNextActTime(_this).then(function(){
+        _this.setupTimes();
+
+        setInterval(()=>{
+          _this.getCountDownData();
+        },1000);
+      })
+    },
+    loadNextActTime(_this){
+        return fetch('https://valorant-api.com/v1/seasons')
+              .then(res => res.json())
+              .then(res => {
+                let acts = res.data.filter(act => {
+                    let diff = moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds;
+                    return act.type != null && diff >= 0;
                   })
-                  // this.act_time = moment.tz(moment(acts[0].startTime,["MMM D, YYYY hh:mm A"]),moment.tz.guess());
                   this.act_time = moment.utc(acts[0].startTime);
                   let ep = (new RegExp('(Episode)([0-9])+').exec(acts[0].assetPath));
                   let a = (new RegExp('(Act)([0-9])+').exec(acts[0].assetPath));
                   this.episodeName = ep[1]+" "+ep[2];
                   this.actName = a[1]+" "+a[2];
-                });
+                  localStorage.setItem("episodeName",this.episodeName);
+                  localStorage.setItem("actName",this.actName);
+                  localStorage.setItem("act_time",this.act_time);
+              });
     },
     setupTimes(){
       this.local_zone_abbr = moment.tz(moment.tz.guess()).zoneAbbr();
       this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A")
       this.getCountDownData();
+      localStorage.setItem("local_zone_abbr",this.local_zone_abbr);
+      localStorage.setItem("act_time_raw",this.act_time_raw);
     },
     getCountDownData(){
       this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A");
@@ -97,6 +120,11 @@ export default {
       this.remaining.hours = d.hours.toLocaleString("en-US",{minimumIntegerDigits:2});
       this.remaining.minutes = d.minutes.toLocaleString("en-US",{minimumIntegerDigits:2});
       this.remaining.seconds = d.seconds.toLocaleString("en-US",{minimumIntegerDigits:2});
+      localStorage.setItem("remainingMonths",this.remaining.months);
+      localStorage.setItem("remainingDays",this.remaining.days);
+      localStorage.setItem("remainingHours",this.remaining.hours);
+      localStorage.setItem("remainingMinutes",this.remaining.minutes);
+      localStorage.setItem("remainingSeconds",this.remaining.seconds);
     },
     getRegionHoursGap(){
       switch(this.region){
