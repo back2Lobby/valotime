@@ -50,6 +50,9 @@ export default {
       region:"",
     }
   },
+  emits: [
+    "publishNotification",
+  ],
   computed:{
     targetTime(){
       return this.act_time_raw + " " +  this.local_zone_abbr;
@@ -91,15 +94,29 @@ export default {
     },
     setupEpisodeData(seasons_data,_this){
         if(seasons_data){
-          let acts = seasons_data.filter(act => {
-            if(act.assetPath.includes("Act")){
+          let acts = seasons_data.filter(act => act.assetPath.includes("Act") && act.type !== null).filter(act => {
               let diff = moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds;
-              return act.type != null && diff >= 0;
-            }
+              return diff >= 0;
           })
-          _this.act_time = moment.utc(acts[0].startTime);
-          let ep = (new RegExp('(Episode)([0-9])+').exec(acts[0].assetPath));
-          let a = (new RegExp('(Act)([0-9])+').exec(acts[0].assetPath));
+
+          // if its doesn't found any act from list then use the last one in list
+          let act = acts.length > 0 ? acts[0] : null;
+          if(!act){
+            acts = seasons_data.filter(act => act.assetPath.includes("Act") && act.type !== null);
+            act = acts[acts.length - 1];
+          }
+
+          // publish notification if act time is already passed
+          if(moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds < 0){
+            this.$emit("publishNotification",{
+              title:"Valorant Act Time",
+              body:"Patch/Update have been delayed by VALORANT. Countdown will be updated shortly."
+            });
+          }
+
+          _this.act_time = moment.utc(act.startTime);
+          let ep = (new RegExp('(Episode)([0-9])+').exec(act.assetPath));
+          let a = (new RegExp('(Act)([0-9])+').exec(act.assetPath));
           _this.episodeName = ep[1]+" "+ep[2];
           _this.actName = a[1]+" "+a[2];
         }
@@ -108,13 +125,6 @@ export default {
       this.region = region;
       this.loadNewData(this,false);
     },
-    // setupTimes(){
-    //   this.local_zone_abbr = moment.tz(moment.tz.guess()).zoneAbbr();
-    //   if(this.act_time){
-    //     this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A")
-    //   }
-    //   this.getCountDownData();
-    // },
     getCountDownData(){
       if(this.act_time){
         this.act_time_raw = moment(this.act_time.clone().add(this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A");

@@ -19,26 +19,37 @@
   </div>
   <p>Valotime provides live countdown according to your current timezone for every next VALORANT Act.</p>
 </div>
-  <Countdown ref="countdown" />
+  <Countdown ref="countdown" @publishNotification="dispatchNotifEvent" />
   <a class="follow" href="https://twitter.com/Back2Lobby">Follow @Back2Lobby</a>
+  <Notification v-bind:notifications="notifications" />
 </template>
 
 <script>
 import Countdown from './components/Countdown.vue'
+import Notification from './components/Notification.vue'
 
 export default {
   name: 'App',
   data() {
     return {
-      region: 'North America'
+      region: 'North America',
+      notifications: [],
     }
   },
   components: {
-    Countdown
+    Countdown,
+    Notification
   },
   methods: {
     regionChanged() {
       this.$refs.countdown.regionChanged(this.region);
+    },
+    dispatchNotifEvent(notification){
+      // prevent duplicate titles
+      if(this.notifications.some(n => n.title === notification.title)){
+        return;
+      }
+      this.notifications.push(notification);
     }
   }
 }
