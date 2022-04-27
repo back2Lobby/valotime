@@ -109,7 +109,7 @@ export default {
           // publish notification if act time is already passed
           if(moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds < 0){
             this.$emit("publishNotification",{
-              title:"Valorant Act Time",
+              title:"Patch Delayed",
               body:"Patch/Update have been delayed by VALORANT. Countdown will be updated shortly."
             });
           }

@@ -1,7 +1,7 @@
 # Valotime
 Valotime provides live countdown according to your current timezone for every next VALORANT Act.
 
-Its a simple PWA made with Vue 3.
+Its a simple PWA made with Vue 3 using API provided by [valorant-api](https://valorant-api.com/)
 
 ## Project setup
 ```
