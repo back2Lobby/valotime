@@ -1,7 +1,7 @@
 <template>
 
 <div class="raw-statement">
-  Valorant {{episodeName}} {{actName}} Release Date : <strong> {{ targetTime }}</strong>
+  Valorant {{episodeName}} {{actName}} {{dateType}} Date : <strong> {{ targetTime }}</strong>
 </div>
 
 <div class="timebox-container">
@@ -46,6 +46,7 @@ export default {
       act_time:null,
       episodeName:"",
       actName:"",
+      dateType:"",
       local_zone_abbr:"",
       region:"",
     }
@@ -94,6 +95,9 @@ export default {
     },
     setupEpisodeData(seasons_data,_this){
         if(seasons_data){
+
+          let nextActNotAvailable = false;
+
           let acts = seasons_data.filter(act => act.assetPath.includes("Act") && act.type !== null).filter(act => {
               let diff = moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds;
               return diff >= 0;
@@ -104,21 +108,23 @@ export default {
           if(!act){
             acts = seasons_data.filter(act => act.assetPath.includes("Act") && act.type !== null);
             act = acts[acts.length - 1];
+            nextActNotAvailable = true;
           }
 
           // publish notification if act time is already passed
-          if(moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds < 0){
+          if(moment.duration(moment.utc(!nextActNotAvailable ? act.startTime : act.endTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds < 0){
             this.$emit("publishNotification",{
               title:"Patch Delayed",
-              body:"Patch/Update have been delayed by VALORANT. Countdown will be updated shortly."
+              body:"Patch/Update has been delayed by VALORANT. Countdown will be updated shortly."
             });
           }
 
-          _this.act_time = moment.utc(act.startTime);
+          _this.act_time = moment.utc(!nextActNotAvailable ? act.startTime : act.endTime);
           let ep = (new RegExp('(Episode)([0-9])+').exec(act.assetPath));
           let a = (new RegExp('(Act)([0-9])+').exec(act.assetPath));
           _this.episodeName = ep[1]+" "+ep[2];
           _this.actName = a[1]+" "+a[2];
+          _this.dateType = !nextActNotAvailable ? "Start" : "End";
         }
     },
     regionChanged(region){
