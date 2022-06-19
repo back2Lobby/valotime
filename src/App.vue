@@ -2,6 +2,10 @@
 <div class="head">
   <h2 class="logo">Valotime</h2>
   <div style="position:absolute;right:0;top:1rem;margin-right:1rem;display:flex;">
+    
+    <!-- page views -->
+    <img style="display:none" src="https://visitor-badge.glitch.me/badge?page_id=valotime.pageviews" />
+  
     <!-- select region -->
     <select class="region-dropdown" v-model="region" @change="regionChanged">
       <option value="Asia Pacific">Asia Pacific</option>
