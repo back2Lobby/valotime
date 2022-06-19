@@ -1,11 +1,12 @@
 <template>
 <div class="head">
   <h2 class="logo">Valotime</h2>
-  <div style="position:absolute;right:0;top:1rem;margin-right:1rem;display:flex;">
-    
-    <!-- page views -->
-    <img style="display:none;position:absolute;margin:4px;bottom:0px;right:0px;" src="https://visitor-badge.glitch.me/badge?page_id=valotime.pageviews" />
   
+  <!-- page views -->
+  <img style="display:none;position:absolute;margin:4px;bottom:0px;right:0px;" src="https://visitor-badge.glitch.me/badge?page_id=valotime.pageviews" />
+  
+  <!-- nav -->
+  <div style="position:absolute;right:0;top:1rem;margin-right:1rem;display:flex;">
     <!-- select region -->
     <select class="region-dropdown" v-model="region" @change="regionChanged">
       <option value="Asia Pacific">Asia Pacific</option>
