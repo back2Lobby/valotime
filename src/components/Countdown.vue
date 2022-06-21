@@ -50,6 +50,10 @@ export default {
       dateType:"",
       local_zone_abbr:"",
       region:"",
+      modifier_data: { //modify data manually if needed
+        days: 1,
+        action: "add"
+      }
     }
   },
   emits: [
@@ -94,14 +98,22 @@ export default {
         _this.act_time_raw = moment(_this.act_time.clone().add(_this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A")
       }
     },
+    processManualModification(targetTime){
+      if(this.modifier_data.action === "add"){
+        return targetTime.add(this.modifier_data.days,'days');
+      }else if(this.modifier_data.action === "subtract"){
+        return targetTime.subtract(this.modifier_data.days,'days');
+      }
+    },
     getNextActThatIsNotStartedYet(seasons_data,_this){
       return seasons_data.filter(act => act.assetPath.includes("Act") && act.type !== null).filter(act => {
-          let diff = moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds;
+          let targetTime = this.processManualModification(moment.utc(act.startTime));
+
+          let diff = moment.duration(targetTime.diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._milliseconds;
           return diff >= 0;
       })
     },
     getLatestActFromSeasonsData(seasons_data,_this){
-
       let acts = [];
 
       acts = this.getNextActThatIsNotStartedYet(seasons_data,_this);
@@ -130,8 +142,8 @@ export default {
           let targetTime = !nextActNotAvailable ? act.startTime : act.endTime;
 
           // add or subtract a day if needed (incase valorant updated data)
-          targetTime = moment.utc(targetTime).add(1,'days');
-          
+          targetTime = this.processManualModification(moment.utc(targetTime));
+
           // publish notification if act time is already passed
           if(moment.duration(targetTime.diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._milliseconds < 0){
             this.$emit("publishNotification",{
