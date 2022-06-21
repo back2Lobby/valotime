@@ -5,19 +5,23 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "production": "vue-cli-service serve --mode production"
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "core-js": "^3.6.5",
-    "moment": "^2.29.1",
-    "moment-timezone": "^0.5.33",
-    "register-service-worker": "^1.7.1",
-    "vue": "^3.0.0"
+    "core-js": "^3.8.3",
+    "moment": "^2.29.3",
+    "moment-timezone": "^0.5.34",
+    "register-service-worker": "^1.7.2",
+    "vue": "^3.2.13"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-pwa": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/compiler-sfc": "^3.0.0"
+    "@babel/core": "^7.12.16",
+    "@babel/eslint-parser": "^7.12.16",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-plugin-pwa": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3"
   }
 }
