@@ -30,6 +30,7 @@
 
 <script>
 import moment from "moment-timezone";
+import seasonsDataBackup from "../seasons_backup.json";
 
 export default {
   name: 'Countdown',
@@ -93,15 +94,30 @@ export default {
         _this.act_time_raw = moment(_this.act_time.clone().add(_this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A")
       }
     },
+    getNextActThatIsNotStartedYet(seasons_data,_this){
+      return seasons_data.filter(act => act.assetPath.includes("Act") && act.type !== null).filter(act => {
+          let diff = moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds;
+          return diff >= 0;
+      })
+    },
+    getLatestActFromSeasonsData(seasons_data,_this){
+
+      let acts = [];
+
+      acts = this.getNextActThatIsNotStartedYet(seasons_data,_this);
+
+      if(acts.length <= 0){
+        acts = this.getNextActThatIsNotStartedYet(seasonsDataBackup.data,_this);
+      }
+
+      return acts;
+    },
     setupEpisodeData(seasons_data,_this){
         if(seasons_data){
 
           let nextActNotAvailable = false;
 
-          let acts = seasons_data.filter(act => act.assetPath.includes("Act") && act.type !== null).filter(act => {
-              let diff = moment.duration(moment.utc(act.startTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds;
-              return diff >= 0;
-          })
+          let acts = this.getLatestActFromSeasonsData(seasons_data,_this);
 
           // if its doesn't found any act from list then use the last one in list
           let act = acts.length > 0 ? acts[0] : null;
@@ -111,15 +127,21 @@ export default {
             nextActNotAvailable = true;
           }
 
+          let targetTime = !nextActNotAvailable ? act.startTime : act.endTime;
+
+          // add or subtract a day if needed (incase valorant updated data)
+          targetTime = moment.utc(targetTime).add(1,'days');
+          
           // publish notification if act time is already passed
-          if(moment.duration(moment.utc(!nextActNotAvailable ? act.startTime : act.endTime).diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._data.milliseconds < 0){
+          if(moment.duration(targetTime.diff(moment.utc())).add(_this.getRegionHoursGap(),'hours')._milliseconds < 0){
             this.$emit("publishNotification",{
               title:"Patch Delayed",
-              body:"Patch/Update has been delayed by VALORANT. Countdown will be updated shortly."
+              body:"Patch/Update has been changed by VALORANT. Countdown will be updated shortly."
             });
           }
 
-          _this.act_time = moment.utc(!nextActNotAvailable ? act.startTime : act.endTime);
+          _this.act_time = targetTime;
+
           let ep = (new RegExp('(Episode)([0-9])+').exec(act.assetPath));
           let a = (new RegExp('(Act)([0-9])+').exec(act.assetPath));
           _this.episodeName = ep[1]+" "+ep[2];
