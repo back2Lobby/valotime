@@ -86,7 +86,9 @@ export default {
       if(navigator.onLine && fetchData){
           fetch("https://valorant-api.com/v1/seasons").then(res => res.json()).then(res => {
             let seasons = res.data;
-            localStorage.setItem("seasons_data", JSON.stringify(seasons));
+
+            this.storeSeasonsDataInLocalStorage(seasons);
+
             this.setupEpisodeData(seasons, _this);
           })
         }else{
@@ -96,6 +98,12 @@ export default {
       _this.local_zone_abbr = moment.tz(moment.tz.guess()).zoneAbbr();
       if(_this.act_time){
         _this.act_time_raw = moment(_this.act_time.clone().add(_this.getRegionHoursGap(),'hours')._d).format("MMM D, YYYY hh:mm A")
+      }
+    },
+    storeSeasonsDataInLocalStorage(seasonsData){
+      let stringifiedData = JSON.stringify(seasonsData);
+      if(JSON.parse(localStorage.getItem("seasons_data")) !== stringifiedData){
+        localStorage.setItem("seasons_data", stringifiedData);
       }
     },
     processManualModification(targetTime){
@@ -119,7 +127,15 @@ export default {
       acts = this.getNextActThatIsNotStartedYet(seasons_data,_this);
 
       if(acts.length <= 0){
-        acts = this.getNextActThatIsNotStartedYet(seasonsDataBackup.data,_this);
+
+        let seasonsData = seasonsDataBackup.data;
+
+        if(seasonsData){
+          acts = this.getNextActThatIsNotStartedYet(seasonsData,_this);
+
+          this.storeSeasonsDataInLocalStorage(seasonsData);
+        }
+        
       }
 
       return acts;
