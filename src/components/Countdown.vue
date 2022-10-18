@@ -51,7 +51,7 @@ export default {
       local_zone_abbr:"",
       region:"",
       modifier_data: { //modify data manually if needed
-        days: 1,
+        days: 0,
         action: "add"
       }
     }
