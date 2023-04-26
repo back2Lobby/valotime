@@ -41,7 +41,7 @@ export default {
       notifications: [
 				{
 					title:"Wrong Countdown?",
-					body:"Please hard reload page if you see wrong countdown data"
+					body:"Please hard reload page with (Ctrl+F5 or Shift+F5) if you see wrong countdown data"
 				}
 			],
     }
