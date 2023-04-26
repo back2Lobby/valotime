@@ -38,7 +38,12 @@ export default {
   data() {
     return {
       region: 'North America',
-      notifications: [],
+      notifications: [
+				{
+					title:"Wrong Countdown?",
+					body:"Please hard reload page if you see wrong countdown data"
+				}
+			],
     }
   },
   components: {
