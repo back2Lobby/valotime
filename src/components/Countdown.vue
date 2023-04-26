@@ -30,7 +30,6 @@
 
 <script>
 import moment from "moment-timezone";
-import seasonsDataBackup from "../seasons_backup.json";
 
 export default {
   name: 'Countdown',
@@ -125,18 +124,6 @@ export default {
       let acts = [];
 
       acts = this.getNextActThatIsNotStartedYet(seasons_data,_this);
-
-      if(acts.length <= 0){
-
-        let seasonsData = seasonsDataBackup.data;
-
-        if(seasonsData){
-          acts = this.getNextActThatIsNotStartedYet(seasonsData,_this);
-
-          this.storeSeasonsDataInLocalStorage(seasonsData);
-        }
-        
-      }
 
       return acts;
     },
