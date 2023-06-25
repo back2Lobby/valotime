@@ -3,7 +3,7 @@
   <h2 class="logo">Valotime</h2>
   
   <!-- page views -->
-  <img style="position:absolute;margin:4px;bottom:0px;right:0px;" src="https://api.visitor.plantree.me/visitor-badge/pv?namespace=valotime&key=namespace@valotime&label=views" />
+  <img style="position:absolute;margin:4px;bottom:0px;right:0px;" src="https://api.visitor.plantree.me/visitor-badge/pv?namespace=valotime&key=namespace@valotime&label=views&color=cf3333" />
   
   <!-- nav -->
   <div style="position:absolute;right:0;top:1rem;margin-right:1rem;display:flex;">
