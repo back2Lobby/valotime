@@ -1,10 +1,7 @@
 <template>
 <div class="head">
   <h2 class="logo">Valotime</h2>
-  
-  <!-- page views -->
-  <img style="position:absolute;margin:4px;bottom:0px;right:0px;" src="https://api.visitor.plantree.me/visitor-badge/pv?namespace=valotime&key=namespace@valotime&label=views&color=cf3333" />
-  
+	
   <!-- nav -->
   <div style="position:absolute;right:0;top:1rem;margin-right:1rem;display:flex;">
     <!-- select region -->
@@ -27,6 +24,11 @@
   <Countdown ref="countdown" @publishNotification="dispatchNotifEvent" />
   <a class="follow" href="https://twitter.com/Back2Lobby">Follow @Back2Lobby</a>
   <Notification v-bind:notifications="notifications" />
+
+<!-- page views -->
+<div style="display:flex; width: 100%;justify-content: end;">
+  <img style="padding-top: 0.6rem" src="https://api.visitor.plantree.me/visitor-badge/pv?namespace=valotime&key=namespace@valotime&label=views&color=cf3333" />  
+</div>
 </template>
 
 <script>
