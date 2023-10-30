@@ -11,7 +11,7 @@
       <option value="Europe">Europe</option>
       <option value="Korea">Korea</option>
       <option value="Latin America">Latin America</option>
-      <option value="North America" selected>North Amercia</option>
+      <option value="North America" selected>North America</option>
     </select>
 
     <!-- github repo -->
