@@ -1,9 +1,7 @@
 <template>
 <div class="head">
-  <h2 class="logo">Valotime</h2>
-	
   <!-- nav -->
-  <div style="position:absolute;right:0;top:1rem;margin-right:1rem;display:flex;">
+  <div style="display:flex;align-items:center;justify-content:end;width:100%;height:60px;padding:1rem;">
     <!-- select region -->
     <select class="region-dropdown" v-model="region" @change="regionChanged">
       <option value="Asia Pacific">Asia Pacific</option>
@@ -19,14 +17,20 @@
       <img src="img/github.png" alt="" width="26" height="26">
     </a>
   </div>
-  <p>Valotime provides live countdown according to your current timezone for every next VALORANT Act.</p>
+
+  <h2 class="logo">Valotime</h2>
+	
+  <p style="padding: 0.3rem 0rem;">Valotime provides live countdown according to your current timezone for every next VALORANT Act.</p>
 </div>
   <Countdown ref="countdown" @publishNotification="dispatchNotifEvent" />
-  <a class="follow" href="https://twitter.com/Back2Lobby">Follow @Back2Lobby</a>
+  <!-- buttons / links -->
+  <dir>
+    <a class="follow" href="https://twitter.com/Back2Lobby">Follow @Back2Lobby</a>
+  </dir>
   <Notification v-bind:notifications="notifications" />
 
 <!-- page views -->
-<div style="display:flex; width: 100%;justify-content: end;">
+<div style="display:flex; width: 100%;justify-content: end;padding:1rem;flex-grow: 1;align-items: end;">
   <img style="padding-top: 0.6rem" src="https://api.visitor.plantree.me/visitor-badge/pv?namespace=valotime&key=namespace@valotime&label=views&color=cf3333" />  
 </div>
 </template>
@@ -71,16 +75,31 @@ export default {
 :root{
   --red:#f84550;
 }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  margin-top: 60px;
+  display:flex;
+  flex-direction: column;
+  height: inherit;
 }
 
 body{
   background-color:#2c3e50;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.head {
+    padding-bottom: 0.6rem;
 }
 
 .logo{

@@ -20,7 +20,7 @@ export default {
     #notificationContainer {
         display: flex;
         flex-direction: column;
-        margin-top: 4rem;
+        margin: 2rem 1rem 0rem 1rem;
         gap: 0.3rem;
     }
 
@@ -28,14 +28,21 @@ export default {
         border: 1px solid var(--red);
         background-color: #333;
         color:white;
-        padding: 0.3rem;
+        padding: 1.2rem 1rem;
     }
 
     .notificaiton-title {
         color: var(--red);
+        margin-bottom: 1rem;
     }
 
     .notification-body {
         font-size: 0.9rem;
+    }
+
+    @media (max-width:640px){
+        .notification {
+            padding: 0.5rem 0.3rem;
+        }
     }
 </style>

@@ -1,7 +1,9 @@
 <template>
 
-<div class="raw-statement">
-  Valorant {{episodeName}} {{actName}} {{dateType}} Date : <strong> {{ targetTime }}</strong>
+<div>
+    <span class="raw-statement">
+        Valorant {{episodeName}} {{actName}} {{dateType}} Date : <strong> {{ targetTime }}</strong>
+    </span>
 </div>
 
 <div class="timebox-container">
@@ -226,7 +228,6 @@ a {
   background-color: #515151;
   display:inline-block;
   padding:0.6rem 0.5rem;
-  
 }
 
 .timebox-container{
@@ -234,7 +235,7 @@ a {
   align-items: center;
   justify-content:space-between;
   margin:auto;
-  max-width: 45rem;
+  width: 45rem;
 }
 
 .timebox{
@@ -255,9 +256,22 @@ a {
 }
 
 @media (max-width:640px){
+  .timebox-container{
+    padding: 0.5rem;
+    width: 100%;
+  }  
   .timebox h3{
     font-size:1.5rem;
   }
+}
+
+@media (min-width:1441px){
+  .timebox-container{
+    width: 54rem;
+  }
+  .timebox h3{
+    font-size:7rem;
+  }  
 }
 
 </style>
